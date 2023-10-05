@@ -88,4 +88,7 @@ public:
 	class UUserWidget* _crosshairUI;
 
 	void InputRun();
+
+	UPROPERTY(EditDefaultsOnly, category = CameraMotion)
+	TSubclassOf<class UCameraShakeBase> cameraShake;
 };
