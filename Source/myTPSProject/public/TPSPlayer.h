@@ -91,4 +91,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, category = CameraMotion)
 	TSubclassOf<class UCameraShakeBase> cameraShake;
+
+	UPROPERTY(EditDefaultsOnly, Category = Sound)
+	class USoundBase* bulletSound;
 };
