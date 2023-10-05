@@ -20,6 +20,9 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 		speed = FVector::DotProduct(forwardVector, velocity);
 
+		FVector rightVector = player->GetActorRightVector();
+		direction = FVector::DotProduct(rightVector, velocity);
+
 		auto movement = player->GetCharacterMovement();
 		isInAir = movement->IsFalling();
 	}
