@@ -126,8 +126,9 @@ void UEnemyFSM::OnDamageProcess()
 	{
 		mState = EEnemyState::Die;
 		me->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		anim->animState = mState;
+		anim->PlayDamageAnim(TEXT("Die"));
 	}
+	anim->animState = mState;
 }
 
 void UEnemyFSM::DamageState()
@@ -144,6 +145,11 @@ void UEnemyFSM::DamageState()
 
 void UEnemyFSM::DieState()
 {
+	if (anim->bDieDone == false)
+	{
+		return;
+	}
+
 	FVector P0 = me->GetActorLocation();
 	FVector vt = FVector::DownVector * dieSpeed * GetWorld()->DeltaTimeSeconds;
 	FVector P = P0 + vt;
