@@ -9,6 +9,7 @@
 #include "Components/CapsuleComponent.h"
 #include "EnemyAnim.h"
 #include "AIController.h"
+#include "NavigationSystem.h"
 
 // Sets default values
 UEnemyFSM::UEnemyFSM()
@@ -70,7 +71,18 @@ void UEnemyFSM::IdleState()
 		currentTime = 0;
 
 		anim->animState = mState;
+		GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
 	}
+}
+
+bool UEnemyFSM::GetRandomPositionInNavMesh(FVector centerLocation, float radius, FVector& dest)
+{
+	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+	FNavLocation loc;
+	bool result = ns->GetRandomReachablePointInRadius(centerLocation, radius, loc);
+	dest = loc.Location;
+
+	return result;
 }
 
 void UEnemyFSM::MoveState()
@@ -82,8 +94,34 @@ void UEnemyFSM::MoveState()
 
 	me->AddMovementInput(dir.GetSafeNormal());
 
+	auto ns = UNavigationSystemV1::GetNavigationSystem(GetWorld());
+
+	FPathFindingQuery query;
+
+	FAIMoveRequest req;
+
+	req.SetAcceptanceRadius(3);
+	req.SetGoalLocation(destination);
+	ai->BuildPathfindingQuery(req, query);
+	FPathFindingResult r = ns->FindPathSync(query);
+
+	if (r.Result == ENavigationQueryResult::Success)
+	{
+		ai->MoveToLocation(destination);
+	}
+	else
+	{
+		auto result = ai->MoveToLocation(randomPos);
+		if (result == EPathFollowingRequestResult::AlreadyAtGoal)
+		{
+			GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
+		}
+	}
+
 	if (dir.Size() < attackRange)
 	{
+		ai->StopMovement();
+
 		mState = EEnemyState::Attack;
 
 		anim->animState = mState;
@@ -110,6 +148,8 @@ void UEnemyFSM::AttackState()
 	{
 		mState = EEnemyState::Move;
 		anim->animState = mState;
+
+		GetRandomPositionInNavMesh(me->GetActorLocation(), 500, randomPos);
 	}
 }
 
@@ -145,6 +185,7 @@ void UEnemyFSM::DamageState()
 		currentTime = 0;
 		anim->animState = mState;
 	}
+	ai->StopMovement();
 }
 
 void UEnemyFSM::DieState()
