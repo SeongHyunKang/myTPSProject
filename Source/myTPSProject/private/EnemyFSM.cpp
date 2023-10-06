@@ -8,6 +8,7 @@
 #include "myTPSProject.h"
 #include "Components/CapsuleComponent.h"
 #include "EnemyAnim.h"
+#include "AIController.h"
 
 // Sets default values
 UEnemyFSM::UEnemyFSM()
@@ -29,6 +30,8 @@ void UEnemyFSM::BeginPlay()
 	me = Cast<AEnemy>(GetOwner());
 	
 	anim = Cast<UEnemyAnim>(me->GetMesh()->GetAnimInstance());
+
+	ai = Cast<AAIController>(me->GetController());
 }
 
 // Called every frame
@@ -75,6 +78,7 @@ void UEnemyFSM::MoveState()
 	FVector destination = target->GetActorLocation();
 
 	FVector dir = destination - me->GetActorLocation();
+	ai->MoveToLocation(destination);
 
 	me->AddMovementInput(dir.GetSafeNormal());
 
@@ -94,7 +98,7 @@ void UEnemyFSM::AttackState()
 	
 	if (currentTime > attackDelayTime)
 	{
-		PRINT_LOG(TEXT("Attack!!!!!"));
+		// PRINT_LOG(TEXT("Attack!!!!!"));
 		currentTime = 0;
 
 		anim->bAttackPlay = true;
