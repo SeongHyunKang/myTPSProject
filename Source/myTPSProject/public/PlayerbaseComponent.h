@@ -19,7 +19,10 @@ public:
 	UPlayerbaseComponent()
 	{
 		PrimaryComponentTick.bCanEverTick = false;
+		bWantsInitializeComponent = true;
 	};
+
+	virtual void InitializeComponent() override;
 
 	virtual void BeginPlay() override;
 

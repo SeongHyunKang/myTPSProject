@@ -19,8 +19,6 @@ void UPlayerbaseComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	me = Cast<ATPSPlayer>(GetOwner());
-	moveComp = me->GetCharacterMovement();
 }
 
 
@@ -32,3 +30,12 @@ void UPlayerbaseComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// ...
 }
 
+void UPlayerbaseComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	me = Cast<ATPSPlayer>(GetOwner());
+	moveComp = me->GetCharacterMovement();
+
+	me->onInputBindingDelegate.AddUObject(this, &UPlayerbaseComponent::SetupInputBinding);
+}
