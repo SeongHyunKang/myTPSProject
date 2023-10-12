@@ -10,6 +10,7 @@
 #include "EnemyFSM.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerAnim.h"
+#include "PlayerMove.h"
 
 // Sets default values
 ATPSPlayer::ATPSPlayer()
@@ -66,14 +67,14 @@ ATPSPlayer::ATPSPlayer()
 	{
 		bulletSound = tempSound.Object;
 	}
+
+	playerMove = CreateDefaultSubobject<UPlayerMove>(TEXT("PlayerMove"));
 }
 
 // Called when the game starts or when spawned
 void ATPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
 
 	_sniperUI = CreateWidget(GetWorld(), sniperUIFactory);
 	_crosshairUI = CreateWidget(GetWorld(), crosshairUIFactory);
@@ -87,18 +88,6 @@ void ATPSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	Move();
-}
-
-void ATPSPlayer::Move()
-{
-	direction = FTransform(GetControlRotation()).TransformVector(direction);
-	/*FVector P0 = GetActorLocation();
-	FVector vt = direction * walkSpeed * DeltaTime;
-	FVector P = P0 + vt;
-	SetActorLocation(P);*/
-	AddMovementInput(direction);
-	direction = FVector::ZeroVector;
 }
 
 // Called to bind functionality to input
@@ -106,12 +95,9 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ATPSPlayer::Turn);
-	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ATPSPlayer::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("Horizontal"), this, &ATPSPlayer::InputHorizontal);
-	PlayerInputComponent->BindAxis(TEXT("Vertical"), this, &ATPSPlayer::InputVertical);
+	playerMove->SetupInputBinding(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ATPSPlayer::InputJump);
+
 	PlayerInputComponent->BindAction(TEXT("Fire"), IE_Pressed, this, &ATPSPlayer::InputFire);
 
 	PlayerInputComponent->BindAction(TEXT("GrenadeGun"), IE_Pressed, this, &ATPSPlayer::ChangeToGrenadeGun);
@@ -119,23 +105,6 @@ void ATPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	PlayerInputComponent->BindAction(TEXT("Sniper"), IE_Pressed, this, &ATPSPlayer::SniperAim);
 	PlayerInputComponent->BindAction(TEXT("Sniper"), IE_Released, this, &ATPSPlayer::SniperAim);
-
-	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &ATPSPlayer::InputRun);
-	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &ATPSPlayer::InputRun);
-}
-
-void ATPSPlayer::InputRun()
-{
-	auto movement = GetCharacterMovement();
-
-	if (movement->MaxWalkSpeed > walkSpeed)
-	{
-		movement->MaxWalkSpeed = walkSpeed;
-	}
-	else
-	{
-		movement->MaxWalkSpeed = runSpeed;
-	}
 }
 
 void ATPSPlayer::SniperAim()
@@ -208,31 +177,6 @@ void ATPSPlayer::InputFire()
 			}
 		}
 	}
-}
-
-void ATPSPlayer::InputJump()
-{
-	Jump();
-}
-
-void ATPSPlayer::InputHorizontal(float value)
-{
-	direction.Y = value;
-}
-
-void ATPSPlayer::InputVertical(float value)
-{
-	direction.X = value;
-}
-
-void ATPSPlayer::Turn(float value)
-{
-	AddControllerYawInput(value);
-}
-
-void ATPSPlayer::LookUp(float value)
-{
-	AddControllerPitchInput(value);
 }
 
 void ATPSPlayer::ChangeToGrenadeGun()
