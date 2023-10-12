@@ -3,6 +3,8 @@
 
 #include "EnemyManager.h"
 #include "Enemy.h"
+#include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyManager::AEnemyManager()
@@ -20,15 +22,40 @@ void AEnemyManager::BeginPlay()
 	
 	float createTime = FMath::RandRange(minTime, maxTime);
 	GetWorld()->GetTimerManager().SetTimer(spawnTimerHandle, this, &AEnemyManager::CreateEnemy, createTime);
+
+	FindSpawnPoints();
 }
 
 void AEnemyManager::CreateEnemy()
 {	
-	int index = FMath::RandRange(0, spawnPoints.Num() - 1);
+	int index = FMath::RandRange(0, spawnPoints.Num()-1);
 	GetWorld()->SpawnActor<AEnemy>(enemyFactory, spawnPoints[index]->GetActorLocation(), FRotator(0));
 
 	float createTime = FMath::RandRange(minTime, maxTime);
 	GetWorld()->GetTimerManager().SetTimer(spawnTimerHandle, this, &AEnemyManager::CreateEnemy, createTime);
+}
+
+void AEnemyManager::FindSpawnPoints()
+{
+	//for (TActorIterator<AActor> It(GetWorld()); It; ++It)
+	//{
+	//	AActor* spawn = *It;
+	//	if (spawn->GetName().Contains(TEXT("BP_EnemySpawnPoint")))
+	//	{
+	//		spawnPoints.Add(spawn);
+	//	}
+	//}
+
+	TArray<AActor*> allActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), allActors);
+
+	for (auto spawn : allActors)
+	{
+		if (spawn->GetName().Contains(TEXT("BP_EnemySpawnPoint")))
+		{
+			spawnPoints.Add(spawn);
+		}
+	}
 }
 
 // Called every frame

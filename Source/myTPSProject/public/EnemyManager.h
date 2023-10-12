@@ -25,10 +25,10 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, Category = SpawnSettings)
-	float minTime = 1;
+	float minTime = 1.0f;
 
 	UPROPERTY(EditAnywhere, Category = SpawnSettings)
-	float maxTime = 5;
+	float maxTime = 5.0f;
 
 	UPROPERTY(EditAnywhere, Category = SpawnSettings)
 	TArray<class AActor*> spawnPoints;
@@ -39,4 +39,6 @@ public:
 	FTimerHandle spawnTimerHandle;
 
 	void CreateEnemy();
+
+	void FindSpawnPoints();
 };
