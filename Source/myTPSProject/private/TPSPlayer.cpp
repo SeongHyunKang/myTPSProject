@@ -92,6 +92,7 @@ void ATPSPlayer::OnHitEvent()
 {
 	PRINT_LOG(TEXT("Damaged!!!!!"));
 	hp--;
+
 	if (hp <= 0)
 	{
 		PRINT_LOG(TEXT("Player is dead!"));

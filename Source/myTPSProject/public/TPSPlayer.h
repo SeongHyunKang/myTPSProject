@@ -60,6 +60,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Health)
 	void OnHitEvent();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Health)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Health) // BlueprintNativeEvent는 블루프린트로 덮어쓰는 방식
 	void OnGameOver();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Health)
+	void OnUsingGrenade(bool isGrenade);
 };

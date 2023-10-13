@@ -97,6 +97,8 @@ void UPlayerFire::ChangeToGrenadeGun()
 	bUsingGrenadeGun = true;
 	sniperGunComp->SetVisibility(false);
 	gunMeshComp->SetVisibility(true);
+
+	me->OnUsingGrenade(bUsingGrenadeGun);
 }
 
 void UPlayerFire::ChangeToSniperGun()
@@ -104,6 +106,8 @@ void UPlayerFire::ChangeToSniperGun()
 	bUsingGrenadeGun = false;
 	sniperGunComp->SetVisibility(true);
 	gunMeshComp->SetVisibility(false);
+
+	me->OnUsingGrenade(bUsingGrenadeGun);
 }
 
 void UPlayerFire::SniperAim()
